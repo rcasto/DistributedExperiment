@@ -1,0 +1,16 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+canvas {
+    display: block;
+}
+
+.canvas-holder {
+    width: 800px;
+    height: 600px;
+    margin: 0 auto;
+}
+.canvas-controls {
+    padding: 5px 0;
+}
