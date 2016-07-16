@@ -1,5 +1,5 @@
 var socket = io();
-var imgUrl = '/test-image.jpeg';
+var imgUrl = '/images/test-image.jpeg';
 
 socket.on('connect', function () {
     console.log('We are fucking connected man');
