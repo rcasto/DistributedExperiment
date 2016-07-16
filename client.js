@@ -25,9 +25,16 @@ window.onload = function () {
         });
     invert.addEventListener('click', function () {
         var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        socket.emit('split-data', {
+        // Method 1: send all the image data at once
+        socket.emit('whole-data', {
             timestamp: new Date().getTime(),
             data: imageData
         });
+        // Method 2: use streams
+        var stream = ss.createStream();
+        ss(socket).emit('stream-data', stream, {
+            timestamp: new Date().getTime()
+        });
+        stream.pipe(imageData);
     });
 };
