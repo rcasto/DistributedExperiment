@@ -14,3 +14,10 @@ canvas {
 .canvas-controls {
     padding: 5px 0;
 }
+
+.connection-ticker {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 8px;
+}

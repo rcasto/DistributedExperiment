@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Distributed Grey Scale</title>
         <link rel="stylesheet" href="styles/styles.css" />
     </head>
@@ -8,8 +9,15 @@
         <div class="canvas-holder">
             <canvas></canvas>
             <div class="canvas-controls">
-                <button class="invert">Grey Scale</button>
+                <button class="whole">Whole</button>
+                <button class="stream">Stream</button>
             </div>
+        </div>
+
+        <div class="connection-ticker" hidden="true">
+            <p>
+                Number of connections: <span class="num-connections"></span>
+            </p>
         </div>
 
         <script src="socket.io-client/socket.io.js"></script>
