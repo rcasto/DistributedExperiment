@@ -10,41 +10,7 @@ socket.on('error', function (error) {
 
 document.addEventListener("DOMContentLoaded", function () {
     var canvas = document.querySelector('canvas');
-    var width = 800;
-    var height = 600;
-
-    var scene, camera, renderer;
-    var geometry, material, mesh;
-    
-    init();
-    animate();
-    
-    function init() {
-    
-        scene = new THREE.Scene();
-    
-        camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
-        camera.position.z = 1000;
-    
-        geometry = new THREE.BoxGeometry( 100, 100, 100 );
-        material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
-    
-        mesh = new THREE.Mesh( geometry, material );
-        scene.add( mesh );
-    
-        renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: false});
-        renderer.setSize( width, height );
-    }
-    
-    function animate() {
-    
-        requestAnimationFrame( animate );
-    
-        mesh.rotation.x += 0.01;
-        mesh.rotation.y += 0.02;
-    
-        renderer.render( scene, camera );
-    }
+    var context = canvas.getContext('2d');
     
     // message method buttons
     var wholeButton = document.querySelector('.whole');
@@ -55,10 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     canvas.width = 800;
     canvas.height = 600;
+
+    // Start the renderer
+    ThreeJSRenderer.initaliazeRenderer(canvas.width, canvas.height, canvas);
+    ThreeJSRenderer.setTextureFromUrl(imgUrl)
     
     ImageLoader.loadImage(imgUrl)
         .then(function (success) {
-            // context.drawImage(success, 0, 0, canvas.width, canvas.height);
+            context.drawImage(success, 0, 0, canvas.width, canvas.height);
         }, function (error) {
             console.error(error);
         });
