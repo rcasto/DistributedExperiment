@@ -13,12 +13,26 @@ document.addEventListener("DOMContentLoaded", function () {
     var canvas = document.querySelector('.canvas');
 
     var validate = document.querySelector('.validate');
+    var render = document.querySelector('.render');
     var jsonText = document.querySelector('.json-world-text');
     var errorStatus = document.querySelector('.error-status');
     var successStatus = document.querySelector('.success-status');
 
     var connectionTicker = document.querySelector('.connection-ticker')
     var numConnections = document.querySelector('.num-connections');
+
+    function validateJSON(json) {
+        try {
+            JSON.parse(json);
+            errorStatus.hidden = true;
+            successStatus.hidden = false;
+            return true;
+        } catch (e) {
+            errorStatus.hidden = false;
+            successStatus.hidden = true;
+            return false;
+        }
+    }
 
     // Method 2: use streams
     // streamButton.addEventListener('click', function () {
@@ -33,13 +47,12 @@ document.addEventListener("DOMContentLoaded", function () {
     //     });
     // });
     validate.addEventListener('click', function () {
-        try {
-            console.log(jsonText.value, JSON.parse(jsonText.value));
-            errorStatus.hidden = true;
-            successStatus.hidden = false;
-        } catch (e) {
-            errorStatus.hidden = false;
-            successStatus.hidden = true;
+        validateJSON(jsonText.value);
+    });
+    render.addEventListener('click', function () {
+        var isValid = validateJSON(jsonText.value);
+        if (isValid) {
+            socket.emit('world-json', jsonText.value);
         }
     });
 

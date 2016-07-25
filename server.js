@@ -76,6 +76,11 @@ io.on('connection', function (socket) {
         }
         dataStreams.push(stream);
     });
+
+    socket.on('world-json', function (json) {
+        var world = JSON.parse(json);
+        console.log('World received:', world);
+    });
     
     // socket.on('image-chunk-result', function (chunkResult) {
     //     console.log('Got chunk result');
