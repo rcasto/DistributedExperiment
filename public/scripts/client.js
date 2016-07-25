@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var validate = document.querySelector('.validate');
     var jsonText = document.querySelector('.json-world-text');
+    var errorStatus = document.querySelector('.error-status');
+    var successStatus = document.querySelector('.success-status');
 
     var connectionTicker = document.querySelector('.connection-ticker')
     var numConnections = document.querySelector('.num-connections');
@@ -33,8 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
     validate.addEventListener('click', function () {
         try {
             console.log(jsonText.value, JSON.parse(jsonText.value));
+            errorStatus.hidden = true;
+            successStatus.hidden = false;
         } catch (e) {
-            console.error(e);
+            errorStatus.hidden = false;
+            successStatus.hidden = true;
         }
     });
 
