@@ -76,10 +76,12 @@ io.on('connection', function (socket) {
         console.log('Received streamed image data');
         console.log('Took ', new Date().getTime() - msg.timestamp, 'milliseconds');
         var numChunks = 0;
+        var start = null;
         stream.on('data', function (imageChunk) {
             console.log('Received chunk', ++numChunks);
             var freeConnection = findFreeConnection();
             if (freeConnection) {
+                start = new Date().getTime();
                 freeConnection.socket.emit('image-chunk', imageChunk);
             } else {
                 missingChunk = imageChunk;
@@ -87,7 +89,8 @@ io.on('connection', function (socket) {
             }
         });
         stream.on('end', function () {
-            console.log('done reading image stream');
+            console.log('done reading image stream, took', 
+                new Date().getTime() - start, 'milliseconds');
             numChunks = 0;
             dataStreams.shift();
             if (dataStreams.length > 0) {

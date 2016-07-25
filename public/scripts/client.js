@@ -90,8 +90,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         numConnections.innerHTML = numConnected;
     });
+    // Data comes from server as ArrayBuffer, must convert to specific typed array (Uint8ClampedArray)
     socket.on('image-chunk', function (imageChunk) {
-        console.log('Received chunk:', imageChunk);
-        socket.emit('image-chunk-result', imageChunk);
+        var imageData = new Uint8ClampedArray(imageChunk);
+        console.log('Received chunk:', imageData);
+        socket.emit('image-chunk-result', imageData);
     });
 });
