@@ -44,7 +44,7 @@ io.on('connection', function (socket) {
         var offset = 0;
         stream.on('data', function (imageChunk) {
             console.log('Received chunk', ++numChunks, imageChunk.length);
-            var freeConnection = findFreeConnection();
+            var freeConnection = ConnectionManager.findFreeConnection();
             var chunkObj = {
                 chunkData: imageChunk,
                 offset: offset
