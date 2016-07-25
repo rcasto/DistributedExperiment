@@ -11,13 +11,38 @@ canvas {
     height: 600px;
     margin: 0 auto;
 }
-.canvas-controls {
-    padding: 5px 0;
-}
 
 .connection-ticker {
     position: fixed;
     bottom: 0;
     right: 0;
     padding: 8px;
+}
+
+.json-world-container {
+    max-width: 800px;
+    width: 100%;
+    max-height: 600px;
+    height: 100%;
+    margin: 0 auto;
+}
+.json-world-text {
+    width: 100%;
+    height: 90%;
+    resize: none;
+}
+.json-world-controls {
+    height: 10%;
+    padding: 5px 0;
+}
+.json-world-controls button {
+    height: 100%;
+}
+
+.status-holder {
+
+}
+.status-holder .error-status {
+    color: #D8000C;
+    background-color: #FFBABA;
 }

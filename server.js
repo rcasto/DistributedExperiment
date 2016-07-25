@@ -64,29 +64,28 @@ io.on('connection', function (socket) {
         io.emit('num-connected', numConnections);
         console.log('A user disconnected', numConnections);
     });
-    // Method 1
-    socket.on('whole-data', function (msg) {
-        console.log('Received whole image data');
-        console.log('Took ', new Date().getTime() - msg.timestamp);
-        console.log('Is instanceof Uint8ClampedArray', 
-            msg.data instanceof Uint8ClampedArray);
-    });
-    // Method 2
+
     ss(socket).on('stream-data', function (stream, msg) {
         console.log('Received streamed image data');
         console.log('Took ', new Date().getTime() - msg.timestamp, 'milliseconds');
         var numChunks = 0;
         var start = null;
+        var offset = 0;
         stream.on('data', function (imageChunk) {
-            console.log('Received chunk', ++numChunks);
+            console.log('Received chunk', ++numChunks, imageChunk.length);
             var freeConnection = findFreeConnection();
+            var chunkObj = {
+                chunkData: imageChunk,
+                offset: offset
+            };
             if (freeConnection) {
                 start = new Date().getTime();
-                freeConnection.socket.emit('image-chunk', imageChunk);
+                freeConnection.socket.emit('image-chunk', chunkObj);
             } else {
-                missingChunk = imageChunk;
+                missingChunk = chunkObj;
                 stream.pause();
             }
+            offset += imageChunk.length;
         });
         stream.on('end', function () {
             console.log('done reading image stream, took', 
@@ -106,6 +105,7 @@ io.on('connection', function (socket) {
         }
         dataStreams.push(stream);
     });
+    
     socket.on('image-chunk-result', function (chunkResult) {
         console.log('Got chunk result');
         if (missingChunk) {

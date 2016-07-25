@@ -1,17 +1,25 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Distributed Grey Scale</title>
+        <title>Distributed Ray Tracing</title>
+        <link rel="stylesheet" href="normalize.css/normalize.css" />
         <link rel="stylesheet" href="styles/styles.css" />
     </head>
     <body>
-        <h1>Distributed Grey scale</h1>
+        <h1>Distributed Ray Tracing</h1>
+
+        <div class="json-world-container">
+            <textarea class="json-world-text" placeholder="Enter your JSON world here..."></textarea>
+            <div class="status-holder" hidden="true">
+                <div class="error-status">Invalid JSON</div>
+            </div>
+            <div class="json-world-controls">
+                <button class="validate">Validate</button>
+            </div>
+        </div>
+
         <div class="canvas-holder">
             <canvas></canvas>
-            <div class="canvas-controls">
-                <button class="whole">Whole</button>
-                <button class="stream">Stream</button>
-            </div>
         </div>
 
         <div class="connection-ticker" hidden="true">
