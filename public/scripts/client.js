@@ -11,7 +11,7 @@ socket.on('error', function (error) {
 document.addEventListener("DOMContentLoaded", function () {
     var canvas = document.querySelector('canvas');
     var context = canvas.getContext('2d');
-
+    
     // message method buttons
     var wholeButton = document.querySelector('.whole');
     var streamButton = document.querySelector('.stream');
@@ -21,6 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     canvas.width = 800;
     canvas.height = 600;
+
+    // Start the renderer
+    ThreeJSRenderer.initaliazeRenderer(canvas.width, canvas.height, canvas);
+    ThreeJSRenderer.setTextureFromUrl(imgUrl)
     
     ImageLoader.loadImage(imgUrl)
         .then(function (success) {
