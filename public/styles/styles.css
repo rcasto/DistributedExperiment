@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+body {
+    padding: 12px;
+}
+
 canvas {
     display: block;
 }

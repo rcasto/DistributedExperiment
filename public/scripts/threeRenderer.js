@@ -32,23 +32,25 @@ var ThreeJSRenderer = (function () {
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
         renderer.setSize( width, height );
 
-        return {
-            renderer: renderer,
-            startRenderLoop: function () {
-                var renderId = null;
-                (function renderLoop() {
+        return (function () {
+            var renderId = null;
+            return {
+                renderer: renderer,
+                startRenderLoop: function () {
                     renderer.render(scene, camera)
-                    renderId = requestAnimationFrame(renderLoop);
-                }());
-            },
-            stopRenderLoop: function () {
-                cancelAnimationFrame(renderId);
-            },
-            setTextureFromUrl: function (url) {
-                setTextureFromUrl(mesh, url);
-                return this;
-            }
-        }
+                    renderId = requestAnimationFrame(this.startRenderLoop.bind(this));
+                    return this;
+                },
+                stopRenderLoop: function () {
+                    cancelAnimationFrame(renderId);
+                    return this;
+                },
+                setTextureFromUrl: function (url) {
+                    setTextureFromUrl(mesh, url);
+                    return this;
+                }
+            };
+        }());
     }
 
     // Set a texture on the full screen quad from a url
