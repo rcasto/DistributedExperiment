@@ -56,6 +56,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Set canvas dimensions
+    canvas.width = 800;
+    canvas.height = 600;
+
+    // Load example JSON
+    XHR.get('examples/example.json')
+        .then(function (json) {
+            // set as placeholder text
+            jsonText.value = json;
+        });
+
     // Start rendering
     ThreeJSRenderer
         .initialize(canvas)
