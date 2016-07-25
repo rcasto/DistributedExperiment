@@ -1,15 +1,18 @@
 var ThreeJSRenderer = (function () {
-    var scene, camera, renderer;
-    var geometry, material;
- 
-    function renderLoop() {
-        requestAnimationFrame(renderLoop);
-        
-        renderer.render(scene, camera)
-    }
 
     // Initializes the renderer and starts the renderloop
-    function initaliazeRenderer(width, height, canvas) {       
+    function initialize(canvas, width, height) {
+        var scene, camera, renderer;
+        var geometry, material;
+
+        // Use width and height of canvas, if no dimensions are passed in
+        if (!width) {
+            width = canvas.width;
+        }
+        if (!height) {
+            height = canvas.height;
+        }
+
         // Create the scene that will only hold the quad 
         scene = new THREE.Scene();
 
@@ -19,29 +22,42 @@ var ThreeJSRenderer = (function () {
 
         // Create full screen quad
         var plane = new THREE.PlaneGeometry(width, height)
-        material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: false } );
+        material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: false });
 
         // Add the mesh to the scene
         mesh = new THREE.Mesh( plane, material );
         scene.add(mesh);
 
         // Create the renderer that will display the quad        
-        renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: false});
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
         renderer.setSize( width, height );
 
-        // Kick off the render loop
-        renderLoop();
+        return {
+            renderer: renderer,
+            startRenderLoop: function () {
+                var renderId = null;
+                (function renderLoop() {
+                    renderer.render(scene, camera)
+                    renderId = requestAnimationFrame(renderLoop);
+                }());
+            },
+            stopRenderLoop: function () {
+                cancelAnimationFrame(renderId);
+            },
+            setTextureFromUrl: function (url) {
+                setTextureFromUrl(mesh, url);
+                return this;
+            }
+        }
     }
 
     // Set a texture on the full screen quad from a url
-    function setTextureFromurl(url) {
-        var tex = new THREE.TextureLoader().load(url);
-        mesh.material.map = tex;
+    function setTextureFromUrl(mesh, url) {
+        mesh.material.map = new THREE.TextureLoader().load(url);;
         mesh.material.needsUpdate = true;
     }
     
     return {
-        initaliazeRenderer: initaliazeRenderer,
-        setTextureFromUrl: setTextureFromurl
+        initialize: initialize
     };
 }());

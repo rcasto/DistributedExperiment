@@ -1,5 +1,7 @@
 var socket = io();
 
+var testImage = 'images/test-image.jpeg';
+
 socket.on('connect', function () {
     console.log('We are fucking connected man');
 });
@@ -8,8 +10,7 @@ socket.on('error', function (error) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // message method buttons
-    var streamButton = document.querySelector('.stream');
+    var canvas = document.querySelector('.canvas');
 
     var validate = document.querySelector('.validate');
     var jsonText = document.querySelector('.json-world-text');
@@ -36,6 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(e);
         }
     });
+
+    // Start rendering
+    ThreeJSRenderer
+        .initialize(canvas)
+        .setTextureFromUrl(testImage)
+        .startRenderLoop();
 
     socket.on('num-connected', function (numConnected) {
         // hide until it is populated with content (numConnected)
