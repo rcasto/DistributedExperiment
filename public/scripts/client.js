@@ -42,6 +42,27 @@ document.addEventListener("DOMContentLoaded", function () {
     canvas.width = 800;
     canvas.height = 600;
 
+    var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 1, 1500);
+    camera.position.z = 400;
+
+    RayTracer.setCamera(camera);
+    RayTracer.setConfig(1, 1);
+    RayTracer.setSkyColors(
+        new THREE.Color(0x000000),
+        new THREE.Color(0x000000)
+    );
+    
+    var scene = new THREE.Scene();
+    var geo = new THREE.BoxGeometry( 200, 200, 200 );
+    var material = new THREE.MeshBasicMaterial( { color: new THREE.Color(0, 255, 0), reflectivity: 0.2, wireframe: false } );
+    var mesh = new THREE.Mesh( geo, material );
+    mesh.rotateX(30 * (Math.PI / 180.0));
+    mesh.updateMatrix();
+    scene.add( mesh );
+    RayTracer.setScene(scene);
+
+    var texture = RayTracer.render(0, 0, canvas.height, canvas.width, canvas.width, canvas.height); 
+
     // Load example JSON and set as default textarea content
     XHR.get('examples/example.json')
         .then(function (json) {
@@ -51,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Start rendering
     var renderObj = ThreeJSRenderer
         .initialize(canvas)
-        .setTextureFromUrl(testImage)
+        .setTextureFromArray(texture, canvas.width, canvas.height)
         .startRenderLoop();
 
     validate.addEventListener('click', function () {
