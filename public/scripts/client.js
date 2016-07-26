@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Set canvas dimensions
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = 400;
+    canvas.height = 300;
 
     var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 1, 1500);
     var scene = new THREE.Scene();
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     RayTracer.setConfig(1, 1);
     RayTracer.setSkyColors(
-        new THREE.Color(0x000000),
+        new THREE.Color(0xFFFFFF),
         new THREE.Color(0x000000)
     );
     RayTracer.setScene(scene);
@@ -93,7 +93,24 @@ document.addEventListener("DOMContentLoaded", function () {
             ThreeJSRenderer
                 .parseJSON(jsonText.value)
                 .then(function (worldObj) {
-                    // render the scene
+                    // After deserialization all objects need to update their world matrix
+                    for (var i = 0; i < worldObj.children.length; i++) {
+                        worldObj.children[i].updateMatrix();
+                        worldObj.children[i].material.reflectivity = 0.5;
+                        worldObj.children[i].material.color = new THREE.Color(Math.trunc(worldObj.children[i].material.color.r * 255), Math.trunc(worldObj.children[i].material.color.g * 255), Math.trunc(worldObj.children[i].material.color.b * 255) ); 
+                    }
+                    
+                    // Set the new scene
+                    RayTracer.setScene(worldObj);
+
+                    // Render the new scene
+                    texture = RayTracer.render(0, 0, canvas.height, canvas.width, canvas.width, canvas.height);
+
+                    // Set the texture on the quad
+                    renderObj.setTextureFromArray(texture, canvas.width, canvas.height);
+                },
+                function(error) {
+                    console.log(error)
                 });
         }
     });
