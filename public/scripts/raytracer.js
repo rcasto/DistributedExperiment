@@ -90,7 +90,7 @@ var RayTracer = (function () {
                 var reflectedColor = renderRecursive(new THREE.Ray(collision.point, reflectionVector), bounces + 1);
 
                 // Final color = reflectivity * bouncedColor + (1.0 - reflectivity) * objectColor
-                return collision.object.material.color.multiplyScalar(1.0 - collision.object.material.reflectivity).add(reflectedColor.multiplyScalar(collision.object.material.reflectivity));
+                return collision.object.material.color.clone().multiplyScalar(1.0 - collision.object.material.reflectivity).add(reflectedColor.multiplyScalar(collision.object.material.reflectivity));
             }
         }
 
