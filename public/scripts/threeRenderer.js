@@ -89,37 +89,11 @@ var ThreeJSRenderer = (function () {
         mesh.material.map.needsUpdate = true;
         mesh.material.needsUpdate = true;
     }
-
-    function makeChunkIterator(width, height, numChunks) {
-        var x = 0, y = 0;
-        var stepX = width / numChunks;
-        var stepY = height / numChunks;
-        return {
-            next: function () {
-                if (x > width && y > height) {
-                    return {
-                        value: {
-                            width: stepX,
-                            height: stepY,
-                            x: x,
-                            y: y
-                        },
-                        done: false
-                    };
-                }
-                return {
-                    value: null,
-                    done: true
-                };
-            }
-        };
-    }
     
     return {
         initialize: initialize,
         loadJSON: loadJSON,
-        parseJSON: parseJSON,
-        makeChunkIterator: makeChunkIterator
+        parseJSON: parseJSON
     };
 
 }());
