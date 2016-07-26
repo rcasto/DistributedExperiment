@@ -3,7 +3,6 @@ var RayTracer = (function () {
 
     function setCamera(threeJsCamera) {
         camera = threeJsCamera;
-        camera.position.z = 400;
     }
 
     function setScene(threeJsScene) {
