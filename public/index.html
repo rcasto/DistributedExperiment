@@ -8,13 +8,23 @@
     <body>
         <h1>Distributed Ray Tracing</h1>
 
+        <p>
+            Copy/Paste a 
+            <a href="https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4">
+                JSON World
+            </a>
+            you want rendered
+        </p>
+
         <div class="json-world-container">
-            <textarea class="json-world-text" placeholder="Enter your JSON world here..."></textarea>
-            <div class="status-holder" hidden="true">
-                <div class="error-status">Invalid JSON</div>
+            <textarea class="json-world-text"></textarea>
+            <div class="status-holder">
+                <div class="status error-status" hidden="true">Invalid JSON</div>
+                <div class="status success-status" hidden="true">Valid JSON</div>
             </div>
             <div class="json-world-controls">
                 <button class="validate">Validate</button>
+                <button class="render">Render</button>
             </div>
         </div>
 
@@ -33,6 +43,7 @@
         <script src="three/build/three.min.js"></script>
         
         <script src="scripts/raytracer.js"></script>
+        <script src="scripts/util/xhr.js"></script>
         <script src="scripts/threeRenderer.js"></script>
         <script src="scripts/client.js"></script>
     </body>

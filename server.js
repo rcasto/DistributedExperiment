@@ -4,6 +4,8 @@ var ss = require('socket.io-stream');
 var http = require('http');
 var path = require('path');
 
+var ConnectionManager = require('./lib/connectionManager');
+
 var port = process.env.PORT || 3000;
 
 var app = express();
@@ -18,51 +20,20 @@ app.get('/', function (req, res) {
     res.sendFile('index.html');
 });
 
-var connections = {};
-var numConnections = 0;
 var dataStreams = [];
 var connectionsWorking = false;
 var missingChunk = null;
 
-function addConnection(socket) {
-    if (!connections[socket.id]) {
-        connections[socket.id] = {
-            socket: socket,
-            isBusy: false
-        };
-        numConnections++;
-        return true;
-    }
-    return false;
-}
-function removeConnection(socket) {
-    if (connections[socket.id]) {
-        numConnections--;
-        delete connections[socket.id];
-        return true;
-    }
-    return false;
-}
-function findFreeConnection() {
-    for (var id in connections) {
-        if (!connections[id].isBusy) {
-            connections[id].isBusy = true;
-            return connections[id];
-        }
-    }
-    return null;
-}
-
 io.on('connection', function (socket) {
-    if (addConnection(socket)) {
-        console.log('A user connected to the network', numConnections);
-        io.emit('num-connected', numConnections);
+    if (ConnectionManager.addConnection(socket)) {
+        console.log('A user connected to the network', ConnectionManager.getNumConnections());
+        io.emit('num-connected', ConnectionManager.getNumConnections());
     }
 
     socket.on('disconnect', function () {
-        removeConnection(socket);
-        io.emit('num-connected', numConnections);
-        console.log('A user disconnected', numConnections);
+        ConnectionManager.removeConnection(socket);
+        io.emit('num-connected', ConnectionManager.getNumConnections());
+        console.log('A user disconnected', ConnectionManager.getNumConnections());
     });
 
     ss(socket).on('stream-data', function (stream, msg) {
@@ -73,7 +44,7 @@ io.on('connection', function (socket) {
         var offset = 0;
         stream.on('data', function (imageChunk) {
             console.log('Received chunk', ++numChunks, imageChunk.length);
-            var freeConnection = findFreeConnection();
+            var freeConnection = ConnectionManager.findFreeConnection();
             var chunkObj = {
                 chunkData: imageChunk,
                 offset: offset
@@ -105,20 +76,25 @@ io.on('connection', function (socket) {
         }
         dataStreams.push(stream);
     });
-    
-    socket.on('image-chunk-result', function (chunkResult) {
-        console.log('Got chunk result');
-        if (missingChunk) {
-            socket.emit('image-chunk', missingChunk);
-            missingChunk = null;
-        } else {
-            connections[socket.id].isBusy = false;
-            if (dataStreams.length > 0 &&
-                dataStreams[0].isPaused()) {
-                dataStreams[0].resume();
-            }
-        }
+
+    socket.on('world-json', function (json) {
+        var world = JSON.parse(json);
+        console.log('World received:', world);
     });
+    
+    // socket.on('image-chunk-result', function (chunkResult) {
+    //     console.log('Got chunk result');
+    //     if (missingChunk) {
+    //         socket.emit('image-chunk', missingChunk);
+    //         missingChunk = null;
+    //     } else {
+    //         connections[socket.id].isBusy = false;
+    //         if (dataStreams.length > 0 &&
+    //             dataStreams[0].isPaused()) {
+    //             dataStreams[0].resume();
+    //         }
+    //     }
+    // });
 });
 
 server.listen(port, function () {
