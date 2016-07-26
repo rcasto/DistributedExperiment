@@ -28,7 +28,7 @@ var RayTracer = (function () {
         var cameraInfo = calculateCameraProperties();
  
         // Create an array based on the rectangle passed in
-        var imageData = new Uint8Array(size)
+        var imageData = new Uint8ClampedArray(size);
 
         // Render scanlines recursivly
         for (var i = 0; i < size; i += 4) {
@@ -113,7 +113,7 @@ var RayTracer = (function () {
             imagePlaneVertical: v.clone().multiplyScalar(2.0 * halfHeight),
             imagePlaneHorizontal: u.clone().multiplyScalar(-2.0 * halfWidth),
             upperLeft: camera.position.clone().sub(v.multiplyScalar(halfHeight)).sub(u.multiplyScalar(-halfWidth)).add(w)
-        }
+        };
     }
     
     function testCollision(ray) {
