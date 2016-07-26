@@ -73,7 +73,7 @@ var ThreeJSRenderer = (function () {
 
     function parseJSON(json) {
         return new Promise(function (resolve, reject) {
-            var loader = new THREE.JSONLoader();
+            var loader = new THREE.ObjectLoader();
             resolve(loader.parse(JSON.parse(json)));
         });
     }
