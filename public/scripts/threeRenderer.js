@@ -47,6 +47,10 @@ var ThreeJSRenderer = (function () {
             setTextureFromUrl: function (url) {
                 setTextureFromUrl(mesh, url);
                 return this;
+            },
+            setTextureFromArray: function (array, width, height) {
+                setTextureFromArray(mesh, array, width, height);
+                return this;
             }
         }
     }
@@ -54,6 +58,12 @@ var ThreeJSRenderer = (function () {
     // Set a texture on the full screen quad from a url
     function setTextureFromUrl(mesh, url) {
         mesh.material.map = new THREE.TextureLoader().load(url);;
+        mesh.material.needsUpdate = true;
+    }
+
+    function setTextureFromArray(mesh, array, width, height) {
+        mesh.material.map = new THREE.DataTexture(array, width, height, THREE.RGBAFormat, THREE.UnsignedByteType);
+        mesh.material.map.needsUpdate = true;
         mesh.material.needsUpdate = true;
     }
     
