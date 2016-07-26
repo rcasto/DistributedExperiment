@@ -12,16 +12,20 @@ socket.on('error', function (error) {
 document.addEventListener("DOMContentLoaded", function () {
     var canvas = document.querySelector('.canvas');
 
+    // Render control components
     var validate = document.querySelector('.validate');
     var render = document.querySelector('.render');
+
+    // JSON World textarea components
     var jsonText = document.querySelector('.json-world-text');
     var errorStatus = document.querySelector('.error-status');
     var successStatus = document.querySelector('.success-status');
 
-    var connectionTicker = document.querySelector('.connection-ticker')
+    // Num connection components
+    var connectionTicker = document.querySelector('.connection-ticker');
     var numConnections = document.querySelector('.num-connections');
 
-    function validateJSON(json) {
+        function validateJSON(json) {
         try {
             JSON.parse(json);
             errorStatus.hidden = true;
@@ -34,44 +38,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Method 2: use streams
-    // streamButton.addEventListener('click', function () {
-    //     var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    //     var stream = ss.createStream();
-    //     var blobStream = ss.createBlobReadStream(new Blob(imageData.data, {
-    //         type: 'image/jpeg'
-    //     }));
-    //     blobStream.pipe(stream);
-    //     ss(socket).emit('stream-data', stream, {
-    //         timestamp: new Date().getTime()
-    //     });
-    // });
+    // Set canvas dimensions
+    canvas.width = 800;
+    canvas.height = 600;
+
+    // Load example JSON and set as default textarea content
+    XHR.get('examples/example.json')
+        .then(function (json) {
+            jsonText.value = json;
+        });
+
+    // Start rendering
+    var renderObj = ThreeJSRenderer
+        .initialize(canvas)
+        .setTextureFromUrl(testImage)
+        .startRenderLoop();
+
     validate.addEventListener('click', function () {
         validateJSON(jsonText.value);
     });
     render.addEventListener('click', function () {
         var isValid = validateJSON(jsonText.value);
         if (isValid) {
-            socket.emit('world-json', jsonText.value);
+            socket.emit('render-world', {
+                json: jsonText.value,
+                width: canvas.width,
+                height: canvas.height
+            });
+            ThreeJSRenderer
+                .parseJSON(jsonText.value)
+                .then(function (worldObj) {
+                    // render the scene
+                });
         }
     });
-
-    // Set canvas dimensions
-    canvas.width = 800;
-    canvas.height = 600;
-
-    // Load example JSON
-    XHR.get('examples/example.json')
-        .then(function (json) {
-            // set as placeholder text
-            jsonText.value = json;
-        });
-
-    // Start rendering
-    ThreeJSRenderer
-        .initialize(canvas)
-        .setTextureFromUrl(testImage)
-        .startRenderLoop();
 
     socket.on('num-connected', function (numConnected) {
         // hide until it is populated with content (numConnected)

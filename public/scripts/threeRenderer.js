@@ -17,20 +17,20 @@ var ThreeJSRenderer = (function () {
         scene = new THREE.Scene();
 
         // Create a orthographic camera so the scene is not distorted by perspective
-        camera = new THREE.OrthographicCamera( width / -2, width / 2, height / 2, height / -2, 1, 1000 );
+        camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);
         camera.position.z = 1
 
         // Create full screen quad
-        var plane = new THREE.PlaneGeometry(width, height)
+        var plane = new THREE.PlaneGeometry(width, height);
         material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: false });
 
         // Add the mesh to the scene
-        mesh = new THREE.Mesh( plane, material );
+        mesh = new THREE.Mesh(plane, material);
         scene.add(mesh);
 
         // Create the renderer that will display the quad        
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
-        renderer.setSize( width, height );
+        renderer.setSize(width, height);
 
         return (function () {
             var renderId = null;
@@ -53,6 +53,27 @@ var ThreeJSRenderer = (function () {
         }());
     }
 
+    function loadJSON(url) {
+        return new Promise(function (resolve, reject) {
+            var loader = new THREE.JSONLoader();
+            loader.load(url, function (geometry, materials) {
+                resolve({
+                    geometry: geometry,
+                    materials: materials
+                });
+            }, function () { }, function (error) {
+                reject(error);
+            });
+        });
+    }
+
+    function parseJSON(json) {
+        return new Promise(function (resolve, reject) {
+            var loader = new THREE.JSONLoader();
+            resolve(loader.parse(JSON.parse(json)));
+        });
+    }
+
     // Set a texture on the full screen quad from a url
     function setTextureFromUrl(mesh, url) {
         mesh.material.map = new THREE.TextureLoader().load(url);;
@@ -60,6 +81,8 @@ var ThreeJSRenderer = (function () {
     }
     
     return {
-        initialize: initialize
+        initialize: initialize,
+        loadJSON: loadJSON,
+        parseJSON: parseJSON
     };
 }());
