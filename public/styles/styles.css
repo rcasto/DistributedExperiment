@@ -54,6 +54,13 @@ canvas {
     height: 100%;
     padding: 3px;
 }
+/*
+    Status style colors take from: http://isabelcastillo.com/error-info-messages-css
+*/
+.status-holder .info-status {
+    color: #00529B;
+    background-color: #BDE5F8;
+}
 .status-holder .error-status {
     color: #D8000C;
     background-color: #FFBABA;
