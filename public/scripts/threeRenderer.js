@@ -95,4 +95,5 @@ var ThreeJSRenderer = (function () {
         loadJSON: loadJSON,
         parseJSON: parseJSON
     };
+
 }());

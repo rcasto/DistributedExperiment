@@ -12,7 +12,7 @@ npm install
 
 Then start the server by running the command
 ```
-node server.js
+npm start
 ```
 
 Navigate to [http://localhost:3000](http://localhost:3000) and you should be started

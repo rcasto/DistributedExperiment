@@ -5,6 +5,7 @@ var http = require('http');
 var path = require('path');
 
 var ConnectionManager = require('./lib/connectionManager');
+var RenderWorkManager = require('./lib/renderWorkManager').initialize();
 
 var port = process.env.PORT || 3000;
 
@@ -33,8 +34,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('render-world', function (msg) {
-        var world = JSON.parse(msg.json);
-        console.log('World received:', world);
+        console.log('Added render job');
+        RenderWorkManager.add(msg);
     });
 });
 
