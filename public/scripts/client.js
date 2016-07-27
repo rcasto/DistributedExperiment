@@ -56,31 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
     render.addEventListener('click', function () {
         var isValid = validateJSON(jsonText.value);
         if (isValid) {
-<<<<<<< HEAD
-            socket.emit('render-world', {
+            var dataToSend = {
                 json: jsonText.value,
                 width: canvas.width,
                 height: canvas.height
-            });
-=======
-            if (!renderObj) {
-                renderObj = ThreeJSRenderer.initialize(canvas);
-            }
-            renderObj.stopRenderLoop();
-            ThreeJSRenderer
-                .parseJSON(jsonText.value)
-                .then(function (world) {
-                    socket.emit('render-world', {
-                        world: world.toJSON(),
-                        width: canvas.width,
-                        height: canvas.height
-                    });
-                    renderObj.setTextureFromWorld(world);
-                    renderObj.startRenderLoop();
-                },function(error) {
-                    console.log(error)
-                });
->>>>>>> ce6bdd2ca5d55130a2e29efd5c95ec614f6b15eb
+            };
+            console.log(dataToSend);
+            socket.emit('render-world', dataToSend);
         }
     });
 
@@ -120,16 +102,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 var texture = RayTracer.render(job.y, job.x, job.height, job.width, job.fullFrameWidth, job.fullFrameHeight);
                 
+                // Display the chunk to the user till render-complete is fired
                 renderObj.setTextureFromArray(texture, textureWidth, textureHeight);
                 renderObj.startRenderLoop();
+
+                socket.emit('worker-done', {
+                    x: job.x,
+                    y: job.y,
+                    width: job.width,
+                    height: job.height,
+                    chunk: texture,
+                    textureLength: texture.length});
             },function(error) {
                 console.log(error)
             });
 
         console.log(job);
-        socket.emit('worker-done', job);
     });
+    
     socket.on('render-complete', function (jobResult) {
         console.log('Received rendered result');
+        
+        var size = jobResult.width * jobResult.height * 4;
+        var texture = new Uint8Array(size);
+
+        // Convert back into a Uint8Array
+        for (var i = 0; i < size; i++) {
+            texture[i] = jobResult.frame[i];
+        }
+
+        // Display the rendered result to the user
+        renderObj.setTextureFromArray(texture, jobResult.width, jobResult.height);
     });
 });
