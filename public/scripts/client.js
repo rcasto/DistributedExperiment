@@ -1,7 +1,5 @@
 var socket = io();
 
-var testImage = 'images/test-image.jpeg';
-
 socket.on('connect', function () {
     console.log('We are fucking connected man');
 });
@@ -58,11 +56,31 @@ document.addEventListener("DOMContentLoaded", function () {
     render.addEventListener('click', function () {
         var isValid = validateJSON(jsonText.value);
         if (isValid) {
+<<<<<<< HEAD
             socket.emit('render-world', {
                 json: jsonText.value,
                 width: canvas.width,
                 height: canvas.height
             });
+=======
+            if (!renderObj) {
+                renderObj = ThreeJSRenderer.initialize(canvas);
+            }
+            renderObj.stopRenderLoop();
+            ThreeJSRenderer
+                .parseJSON(jsonText.value)
+                .then(function (world) {
+                    socket.emit('render-world', {
+                        world: world.toJSON(),
+                        width: canvas.width,
+                        height: canvas.height
+                    });
+                    renderObj.setTextureFromWorld(world);
+                    renderObj.startRenderLoop();
+                },function(error) {
+                    console.log(error)
+                });
+>>>>>>> ce6bdd2ca5d55130a2e29efd5c95ec614f6b15eb
         }
     });
 
@@ -109,5 +127,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
         console.log(job);
+        socket.emit('worker-done', job);
+    });
+    socket.on('render-complete', function (jobResult) {
+        console.log('Received rendered result');
     });
 });

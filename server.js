@@ -33,10 +33,18 @@ io.on('connection', function (socket) {
         console.log('A user disconnected', ConnectionManager.getNumConnections());
     });
 
-    socket.on('render-world', function (msg) {
+    socket.on('render-world', function (job) {
         console.log('Added render job');
-        RenderWorkManager.add(msg);
+        RenderWorkManager.add(job);
     });
+    socket.on('worker-done', function (result) {
+        console.log('A worker has completed its job');
+        RenderWorkManager.emit('worker-done', socket, result);
+    });
+});
+
+RenderWorkManager.on('render-complete', function (socket, jobResult) {
+    io.to(socket.id).emit('render-complete', jobResult);
 });
 
 server.listen(port, function () {
