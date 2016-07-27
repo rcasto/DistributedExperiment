@@ -21,9 +21,10 @@ var RayTracer = (function () {
         skyColorBottom = new THREE.Vector3(bottom.r, bottom.g, bottom.b);
     }
 
-    function render(top, right, bottom, left, fullWidth, fullHeight) {
-        var width = left - right;
-        var height = bottom - top;
+    // Render a rectangle of the image.  NOTE: origin is in lower left of image
+    function render(bottom, left, top, right, fullWidth, fullHeight) {
+        var width = right - left;
+        var height = top - bottom;
         var size = width * height * 4;
         var cameraInfo = calculateCameraProperties();
  
@@ -32,8 +33,9 @@ var RayTracer = (function () {
 
         // Render scanlines recursivly
         for (var i = 0; i < size; i += 4) {
-            var x = ((i / 4) % width) + right;
-            var y = (((i / 4) - x) / width) + top;
+            var x = ((i / 4) % width) + left;
+            var y = (((i / 4) - x) / width) + bottom;
+            
             var red = 0.0;
             var green = 0.0;
             var blue = 0.0;
@@ -43,7 +45,7 @@ var RayTracer = (function () {
                 var u = (x + Math.random()) / fullWidth;
                 var v = (y + Math.random()) / fullHeight;
                 
-                var dir = cameraInfo.upperLeft.clone();
+                var dir = cameraInfo.lowerLeft.clone();
                 dir = dir.add(cameraInfo.imagePlaneHorizontal.clone().multiplyScalar(u));
                 dir = dir.add(cameraInfo.imagePlaneVertical.clone().multiplyScalar(v));
                 dir = dir.sub(camera.position).normalize();
@@ -96,7 +98,7 @@ var RayTracer = (function () {
 
         // Calculate the color based on the sky colors
         var t = 0.5 * (ray.direction.y + 1.0);
-        var skyColor = new THREE.Vector3(0,0,0).lerpVectors(skyColorTop, skyColorBottom, t);
+        var skyColor = new THREE.Vector3(0,0,0).lerpVectors(skyColorBottom, skyColorTop, t);
         return new THREE.Color(Math.trunc(skyColor.x * 255), Math.trunc(skyColor.y * 255), Math.trunc(skyColor.z * 255));        
     }
 
@@ -107,12 +109,12 @@ var RayTracer = (function () {
         var upVec = new THREE.Vector3(0, 1, 0); 
         var w = camera.getWorldDirection();
         var u = upVec.clone().cross(w).normalize();
-        var v = u.clone().cross(w).normalize();
+        var v = w.clone().cross(u).normalize();//u.clone().cross(w).normalize();
 
         return {
             imagePlaneVertical: v.clone().multiplyScalar(2.0 * halfHeight),
             imagePlaneHorizontal: u.clone().multiplyScalar(-2.0 * halfWidth),
-            upperLeft: camera.position.clone().sub(v.multiplyScalar(halfHeight)).sub(u.multiplyScalar(-halfWidth)).add(w)
+            lowerLeft: camera.position.clone().sub(v.multiplyScalar(halfHeight)).sub(u.multiplyScalar(-halfWidth)).add(w)
         }
     }
     
