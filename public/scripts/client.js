@@ -97,8 +97,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 // Set the new scene
                 RayTracer.setScene(world);
-                var texture = RayTracer.render(job.x, job.y, job.height, job.width, job.width, job.height);
-                renderObj.setTextureFromArray(texture, job.width, job.height);
+                var textureWidth = job.width - job.x;
+                var textureHeight = job.height - job.y;
+                
+                var texture = RayTracer.render(job.y, job.x, job.height, job.width, job.fullFrameWidth, job.fullFrameHeight);
+                
+                renderObj.setTextureFromArray(texture, textureWidth, textureHeight);
                 renderObj.startRenderLoop();
             },function(error) {
                 console.log(error)
