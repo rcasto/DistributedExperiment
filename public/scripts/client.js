@@ -1,7 +1,5 @@
 var socket = io();
 
-var testImage = 'images/test-image.jpeg';
-
 socket.on('connect', function () {
     console.log('We are fucking connected man');
 });
@@ -61,15 +59,15 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!renderObj) {
                 renderObj = ThreeJSRenderer.initialize(canvas);
             }
-            socket.emit('render-world', {
-                json: jsonText.value,
-                width: canvas.width,
-                height: canvas.height
-            });
             renderObj.stopRenderLoop();
             ThreeJSRenderer
                 .parseJSON(jsonText.value)
                 .then(function (world) {
+                    socket.emit('render-world', {
+                        world: world.toJSON(),
+                        width: canvas.width,
+                        height: canvas.height
+                    });
                     renderObj.setTextureFromWorld(world);
                     renderObj.startRenderLoop();
                 },function(error) {
@@ -87,5 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     socket.on('worker-job', function (job) {
         console.log('I got a job to do!');
+        socket.emit('worker-done', job);
+    });
+    socket.on('render-complete', function (jobResult) {
+        console.log('Received rendered result');
     });
 });
