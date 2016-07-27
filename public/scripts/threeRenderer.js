@@ -2,8 +2,7 @@ var ThreeJSRenderer = (function () {
 
     // Initializes the renderer and starts the renderloop
     function initialize(canvas, width, height) {
-        var scene, camera, mesh, renderer;
-        var geometry, material;
+        var scene, camera, renderer, mesh;
 
         // Use width and height of canvas, if no dimensions are passed in
         if (!width) {
@@ -16,31 +15,18 @@ var ThreeJSRenderer = (function () {
         // Create the scene that will only hold the quad 
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(90, width / height, 1, 1500);
-        camera.position.z = 400;
+        // Create a orthographic camera so the scene is not distorted by perspective
+        camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);
+        camera.position.z = 1
 
         // Create full screen quad
-        geometry = new THREE.BoxGeometry(200, 200, 200);
-        material = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(0, 255, 0), 
-            reflectivity: 0.2, 
-            wireframe: false
+        var plane = new THREE.PlaneGeometry(width, height);
+        var material = new THREE.MeshBasicMaterial({
+             color: 0xFFFFFF, 
+             wireframe: false 
         });
-
-        // Add the mesh to the scene
-        mesh = new THREE.Mesh(geometry, material);
-
-        mesh.rotateX(30 * (Math.PI / 180.0));
-        mesh.updateMatrix();
+        mesh = new THREE.Mesh(plane, material);
         scene.add(mesh);
-
-        RayTracer.setConfig(1, 1);
-        RayTracer.setSkyColors(
-            new THREE.Color(0xFFFFFF),
-            new THREE.Color(0x000000)
-        );
-        RayTracer.setScene(scene);
-        RayTracer.setCamera(camera);
 
         // Create the renderer that will display the quad        
         renderer = new THREE.WebGLRenderer({ 
@@ -48,6 +34,16 @@ var ThreeJSRenderer = (function () {
             antialias: false 
         });
         renderer.setSize(width, height);
+
+        // Initialize RayTracer
+        var rayTracerStaticCamera = new THREE.PerspectiveCamera(90, width / height, 1, 1500);
+        rayTracerStaticCamera.position.z = 400;        
+        RayTracer.setConfig(1, 1);
+        RayTracer.setSkyColors(
+            new THREE.Color(0xFFFFFF),
+            new THREE.Color(0x000000)
+        );
+        RayTracer.setCamera(rayTracerStaticCamera);
 
         return (function () {
             var renderId = null;
@@ -110,6 +106,7 @@ var ThreeJSRenderer = (function () {
                 Math.trunc(world.children[i].material.color.b * 255) 
             ); 
         }
+        
         // Set the new scene
         RayTracer.setScene(world);
         var texture = RayTracer.render(0, 0, height, width, width, height);
