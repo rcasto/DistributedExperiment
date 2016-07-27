@@ -111,7 +111,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     width: job.width,
                     height: job.height,
                     chunk: texture,
-                    textureLength: texture.length});
+                    textureLength: texture.length
+                });
             },function(error) {
                 console.log(error)
             });
