@@ -117,6 +117,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
         console.log(job);
+
+        var worker = new Worker('scripts/rayTraceWorker.js');
+        worker.onmessage = function (result) {
+            socket.emit('worker-done', result);
+        };
     });
     
     socket.on('render-complete', function (jobResult) {
