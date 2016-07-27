@@ -58,23 +58,11 @@ document.addEventListener("DOMContentLoaded", function () {
     render.addEventListener('click', function () {
         var isValid = validateJSON(jsonText.value);
         if (isValid) {
-            if (!renderObj) {
-                renderObj = ThreeJSRenderer.initialize(canvas);
-            }
             socket.emit('render-world', {
                 json: jsonText.value,
                 width: canvas.width,
                 height: canvas.height
             });
-            renderObj.stopRenderLoop();
-            ThreeJSRenderer
-                .parseJSON(jsonText.value)
-                .then(function (world) {
-                    renderObj.setTextureFromWorld(world);
-                    renderObj.startRenderLoop();
-                },function(error) {
-                    console.log(error)
-                });
         }
     });
 
@@ -87,5 +75,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     socket.on('worker-job', function (job) {
         console.log('I got a job to do!');
+
+        if (!renderObj) {
+            renderObj = ThreeJSRenderer.initialize(canvas);
+        }
+
+        // renderObj.stopRenderLoop();
+        ThreeJSRenderer
+            .parseJSON(job.json)
+            .then(function (world) {
+                // After deserialization all objects need to update their world matrix
+                for (var i = 0; i < world.children.length; i++) {
+                    world.children[i].updateMatrix();
+                    world.children[i].material.reflectivity = 0.5;
+                    world.children[i].material.color = new THREE.Color(
+                        Math.trunc(world.children[i].material.color.r * 255), 
+                        Math.trunc(world.children[i].material.color.g * 255), 
+                        Math.trunc(world.children[i].material.color.b * 255) 
+                    );
+                }
+                
+                // Set the new scene
+                RayTracer.setScene(world);
+                var texture = RayTracer.render(job.x, job.y, job.height, job.width, job.width, job.height);
+                renderObj.setTextureFromArray(texture, job.width, job.height);
+                renderObj.startRenderLoop();
+            },function(error) {
+                console.log(error)
+            });
+
+        console.log(job);
     });
 });
