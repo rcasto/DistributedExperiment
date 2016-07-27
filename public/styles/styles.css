@@ -37,9 +37,7 @@ canvas {
     resize: none;
 }
 .json-world-controls {
-    position: absolute;
-    bottom: 0;
-    height: calc(15% - 32px);
+    height: calc(15% - 40px);
     padding: 5px 0;
 }
 .json-world-controls button {
@@ -47,7 +45,7 @@ canvas {
 }
 
 .status-holder {
-    height: 32px;
+    height: 40px;
     padding-top: 3px;
 }
 .status-holder .status {
@@ -68,4 +66,16 @@ canvas {
 .status-holder .success-status {
     color: #4F8A10;
     background-color: #DFF2BF;
+}
+
+/*
+    Media Queries 
+*/
+@media (max-width: 600px) {
+    .status-holder {
+        height: 52px;
+    }
+    .json-world-controls {
+        height: calc(15% - 52px);
+    }
 }

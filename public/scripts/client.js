@@ -85,7 +85,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     socket.on('worker-job', function (job) {
         console.log('I got a job to do!');
-        socket.emit('worker-done', job);
+        var worker = new Worker('scripts/rayTraceWorker.js');
+        worker.onmessage = function (result) {
+            socket.emit('worker-done', result);
+        };
     });
     socket.on('render-complete', function (jobResult) {
         console.log('Received rendered result');
