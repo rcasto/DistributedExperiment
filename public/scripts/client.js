@@ -89,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         worker.onmessage = function (result) {
             socket.emit('worker-done', result);
         };
+        worker.postMessage(job);
     });
     socket.on('render-complete', function (jobResult) {
         console.log('Received rendered result');
