@@ -6,6 +6,7 @@ var path = require('path');
 
 var ConnectionManager = require('./lib/connectionManager');
 var RenderWorkManager = require('./lib/renderWorkManager').initialize();
+var Helpers = require('./lib/util/helpers');
 
 var port = process.env.PORT || 3000;
 
@@ -35,16 +36,18 @@ io.on('connection', function (socket) {
 
     socket.on('render-world', function (job) {
         console.log('Added render job');
-        RenderWorkManager.add(job);
+        RenderWorkManager.add(Helpers.extend(job, {
+            socketId: socket.id
+        }));
     });
     socket.on('worker-done', function (result) {
         console.log('A worker has completed its job');
-        RenderWorkManager.emit('worker-done', socket, result);
+        RenderWorkManager.emit('worker-done', result);
     });
 });
 
-RenderWorkManager.on('render-complete', function (socket, jobResult) {
-    io.to(socket.id).emit('render-complete', jobResult);
+RenderWorkManager.on('render-complete', function (socketId, jobResult) {
+    io.to(socketId).emit('render-complete', jobResult);
 });
 
 server.listen(port, function () {

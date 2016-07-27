@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 width: canvas.width,
                 height: canvas.height
             };
-            console.log(dataToSend);
             socket.emit('render-world', dataToSend);
         }
     });
