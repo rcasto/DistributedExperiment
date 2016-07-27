@@ -43,6 +43,17 @@ var ThreeJSRenderer = (function () {
             new THREE.Color(0xFFFFFF),
             new THREE.Color(0x000000)
         );
+        // Comment above color code out and use this to see each chunk in the final image
+        // RayTracer.setSkyColors(
+        //     new THREE.Color(
+        //         Math.random(),
+        //         Math.random(),
+        //         Math.random()),
+        //     new THREE.Color(
+        //         Math.random(),
+        //         Math.random(),
+        //         Math.random())
+        // );
         RayTracer.setCamera(rayTracerStaticCamera);
 
         return (function () {
