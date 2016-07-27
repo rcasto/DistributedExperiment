@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": ">= v6.3.0"
+  },
   "scripts": {
     "start": "node server.js",
     "clean": "rm -rf node_modules"
