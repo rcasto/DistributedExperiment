@@ -35,27 +35,6 @@ var ThreeJSRenderer = (function () {
         });
         renderer.setSize(width, height);
 
-        // Initialize RayTracer
-        var rayTracerStaticCamera = new THREE.PerspectiveCamera(90, width / height, 1, 1500);
-        rayTracerStaticCamera.position.z = 400;        
-        RayTracer.setConfig(1, 1);
-        RayTracer.setSkyColors(
-            new THREE.Color(0xFFFFFF),
-            new THREE.Color(0x000000)
-        );
-        // Comment above color code out and use this to see each chunk in the final image
-        // RayTracer.setSkyColors(
-        //     new THREE.Color(
-        //         Math.random(),
-        //         Math.random(),
-        //         Math.random()),
-        //     new THREE.Color(
-        //         Math.random(),
-        //         Math.random(),
-        //         Math.random())
-        // );
-        RayTracer.setCamera(rayTracerStaticCamera);
-
         return (function () {
             var renderId = null;
             return {

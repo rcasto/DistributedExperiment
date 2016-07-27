@@ -79,50 +79,13 @@ document.addEventListener("DOMContentLoaded", function () {
             renderObj = ThreeJSRenderer.initialize(canvas);
         }
 
-        // renderObj.stopRenderLoop();
-        ThreeJSRenderer
-            .parseJSON(job.json)
-            .then(function (world) {
-                // After deserialization all objects need to update their world matrix
-                for (var i = 0; i < world.children.length; i++) {
-                    world.children[i].updateMatrix();
-                    world.children[i].material.reflectivity = 0.5;
-                    world.children[i].material.color = new THREE.Color(
-                        Math.trunc(world.children[i].material.color.r * 255), 
-                        Math.trunc(world.children[i].material.color.g * 255), 
-                        Math.trunc(world.children[i].material.color.b * 255) 
-                    );
-                }
-                
-                // Set the new scene
-                RayTracer.setScene(world);
-                var textureWidth = job.width - job.x;
-                var textureHeight = job.height - job.y;
-                
-                var texture = RayTracer.render(job.y, job.x, job.height, job.width, job.fullFrameWidth, job.fullFrameHeight);
-                
-                // Display the chunk to the user till render-complete is fired
-                renderObj.setTextureFromArray(texture, textureWidth, textureHeight);
-                renderObj.startRenderLoop();
-
-                socket.emit('worker-done', {
-                    x: job.x,
-                    y: job.y,
-                    width: job.width,
-                    height: job.height,
-                    chunk: texture,
-                    textureLength: texture.length
-                });
-            },function(error) {
-                console.log(error)
-            });
-
         console.log(job);
 
         var worker = new Worker('scripts/rayTraceWorker.js');
         worker.onmessage = function (result) {
-            socket.emit('worker-done', result);
+            socket.emit('worker-done', result.data);            
         };
+
         worker.postMessage(job);
     });
     
@@ -139,5 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Display the rendered result to the user
         renderObj.setTextureFromArray(texture, jobResult.width, jobResult.height);
+        renderObj.startRenderLoop();
     });
 });
