@@ -30,6 +30,7 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         ConnectionManager.removeConnection(socket);
+        RenderWorkManager.removeWorker(socket);
         io.emit('num-connected', ConnectionManager.getNumConnections());
         console.log('A user disconnected', ConnectionManager.getNumConnections());
     });
@@ -45,6 +46,8 @@ io.on('connection', function (socket) {
     });
     socket.on('worker-done', function (result) {
         console.log('A worker has completed its job');
+        
+        result.socket = socket;
         RenderWorkManager.emit('worker-done', result);
     });
 });
