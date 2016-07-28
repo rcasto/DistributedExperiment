@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
     generate.addEventListener('click', function() {
+
         var generatedScene = ThreeJSRenderer.generateScene();
         jsonText.value = JSON.stringify(generatedScene.toJSON());
     });
