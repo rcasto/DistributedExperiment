@@ -9,6 +9,7 @@ socket.on('error', function (error) {
 
 document.addEventListener("DOMContentLoaded", function () {
     var renderObj = null;
+    var isWebGLSupported = Helpers.isWebGLSupported();
 
     var canvas = document.querySelector('.canvas');
 
@@ -18,27 +19,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // JSON World textarea components
     var jsonText = document.querySelector('.json-world-text');
-    var infoStatus = document.querySelector('.info-status');
-    var errorStatus = document.querySelector('.error-status');
-    var successStatus = document.querySelector('.success-status');
+    var info = document.querySelector('#info');
+    var invalid = document.querySelector('#invalid');
+    var success = document.querySelector('#success');
+    var unsupported = document.querySelector('#unsupported');
 
     // Num connection components
     var connectionTicker = document.querySelector('.connection-ticker');
     var numConnections = document.querySelector('.num-connections');
-
-    function validateJSON(json) {
-        infoStatus.hidden = true;
-        try {
-            JSON.parse(json);
-            errorStatus.hidden = true;
-            successStatus.hidden = false;
-            return true;
-        } catch (e) {
-            errorStatus.hidden = false;
-            successStatus.hidden = true;
-            return false;
-        }
-    }
 
     // Set canvas dimensions
     canvas.width = 400;
@@ -50,18 +38,37 @@ document.addEventListener("DOMContentLoaded", function () {
             jsonText.value = json;
         });
 
+    if (!isWebGLSupported) {
+        info.hidden = true;
+        unsupported.hidden = false;
+    }
+
+    function setStatus(isValidJSON) {
+        info.hidden = true;
+        if (isValidJSON) {
+            invalid.hidden = true;
+            success.hidden = false;
+        } else {
+            invalid.hidden = false;
+            success.hidden = true;
+        }
+    }
+
     validate.addEventListener('click', function () {
-        validateJSON(jsonText.value);
+        setStatus(Helpers.isValidJSON(jsonText.value));
     });
     render.addEventListener('click', function () {
-        var isValid = validateJSON(jsonText.value);
-        if (isValid) {
-            var dataToSend = {
-                json: jsonText.value,
-                width: canvas.width,
-                height: canvas.height
-            };
-            socket.emit('render-world', dataToSend);
+        if (isWebGLSupported) {
+            var isValid = Helpers.isValidJSON(jsonText.value);
+            if (isValid) {
+                var dataToSend = {
+                    json: jsonText.value,
+                    width: canvas.width,
+                    height: canvas.height
+                };
+                socket.emit('render-world', dataToSend);
+            }
+            setStatus(isValid);
         }
     });
 
@@ -88,7 +95,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         worker.postMessage(job);
     });
-    
     socket.on('render-complete', function (jobResult) {
         console.log('Received rendered result');
         

@@ -5,7 +5,7 @@ var path = require('path');
 
 var ConnectionManager = require('./lib/connectionManager');
 var RenderWorkManager = require('./lib/renderWorkManager').initialize();
-var Helpers = require('./lib/util/helpers');
+var Helpers = require('./shared/helpers');
 
 var port = process.env.PORT || 3000;
 
@@ -16,6 +16,7 @@ var io = require('socket.io')(server);
 // Setup static routes
 app.use(express.static(path.join(__dirname, 'node_modules')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'shared')));
 
 app.get('/', function (req, res) {
     res.sendFile('index.html');
