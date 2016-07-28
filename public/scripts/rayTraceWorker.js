@@ -17,6 +17,8 @@ onmessage = function (job) {
 
             // Initialize RayTracer
             var rayTracerStaticCamera = new THREE.PerspectiveCamera(90, job.data.fullFrameWidth / job.data.fullFrameHeight, 1, 1500);
+            // rayTracerStaticCamera.position.x = 400;
+            // rayTracerStaticCamera.position.y = 400;
             rayTracerStaticCamera.position.z = 400;
             RayTracer.setCamera(rayTracerStaticCamera);
             
@@ -39,8 +41,15 @@ onmessage = function (job) {
 
             // Set the new scene
             RayTracer.setScene(world);
+            var previousPercent = 0;
+            var progress = function(percentComplete) { 
+                if (percentComplete != previousPercent) {
+                    console.log(percentComplete); 
+                    previousPercent = percentComplete
+                } 
+            };
 
-            var texture = RayTracer.render(job.data.y, job.data.x, job.data.height, job.data.width, job.data.fullFrameWidth, job.data.fullFrameHeight);
+            var texture = RayTracer.render(job.data.y, job.data.x, job.data.height, job.data.width, job.data.fullFrameWidth, job.data.fullFrameHeight, progress);
             
             var result = {
                 x: job.data.x,
