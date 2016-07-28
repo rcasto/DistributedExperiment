@@ -30,25 +30,34 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         ConnectionManager.removeConnection(socket);
-        RenderWorkManager.removeWorker(socket);
+        RenderWorkManager.removeWorker(socket.id);
         io.emit('num-connected', ConnectionManager.getNumConnections());
         console.log('A user disconnected', ConnectionManager.getNumConnections());
     });
 
-    socket.on('render-world', function (job) {
+    socket.on('worker-job', function (job) {
         console.log('Added render job');
         RenderWorkManager.add(Helpers.extend(job, {
             socketId: socket.id
         }));
     });
+    socket.on('worker-progress', function (percentComplete) {
+        RenderWorkManager.emit('worker-progress', {
+            socketId: socket.id,
+            percentComplete: percentComplete
+        });
+    });
     socket.on('worker-done', function (result) {
         console.log('A worker has completed its job');
-        
-        result.socket = socket;
-        RenderWorkManager.emit('worker-done', result);
+        RenderWorkManager.emit('worker-done', Helpers.extend(result, {
+            socketId: socket.id
+        }));
     });
 });
 
+RenderWorkManager.on('render-progress', function (socketId, progress) {
+
+});
 RenderWorkManager.on('render-complete', function (socketId, jobResult) {
     io.to(socketId).emit('render-complete', jobResult);
 });

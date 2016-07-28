@@ -43,24 +43,27 @@ onmessage = function (job) {
             RayTracer.setScene(world);
             var previousPercent = 0;
             var progress = function(percentComplete) { 
-                if (percentComplete != previousPercent) {
-                    console.log(percentComplete); 
-                    previousPercent = percentComplete
+                if (previousPercent + 5 <= percentComplete) {
+                    postMessage({
+                        type: 'progress',
+                        percentage: percentComplete
+                    });
+                    previousPercent = percentComplete;
                 } 
             };
 
-            var texture = RayTracer.render(job.data.y, job.data.x, job.data.height, job.data.width, job.data.fullFrameWidth, job.data.fullFrameHeight, progress);
-            
-            var result = {
+            var texture = RayTracer.render(job.data.y, job.data.x, job.data.height, job.data.width, 
+                job.data.fullFrameWidth, job.data.fullFrameHeight, progress);
+
+            postMessage({
+                type: 'result',
                 x: job.data.x,
                 y: job.data.y,
                 width: job.data.width,
                 height: job.data.height,
                 chunk: texture,
                 textureLength: texture.length
-            };
-
-            postMessage(result);
+            });
             close();
         });
-};
+    };

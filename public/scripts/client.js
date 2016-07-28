@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var renderObj = null;
     var isWebGLSupported = Helpers.isWebGLSupported();
 
+    var canvasHolder = document.querySelector('.canvas-holder');
     var canvas = document.querySelector('.canvas');
 
     // Render control components
@@ -20,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // JSON World textarea components
     var jsonText = document.querySelector('.json-world-text');
+    var progress = document.querySelector('#progress');
+    var progressStatus = document.querySelector('.progress-status');
+    var rendered = document.querySelector('#rendered');
     var info = document.querySelector('#info');
     var invalid = document.querySelector('#invalid');
     var success = document.querySelector('#success');
@@ -29,76 +33,96 @@ document.addEventListener("DOMContentLoaded", function () {
     var connectionTicker = document.querySelector('.connection-ticker');
     var numConnections = document.querySelector('.num-connections');
 
+<<<<<<< HEAD
     // Set canvas dimensions
     canvas.width = 800;
     canvas.height = 600;
 
+=======
+>>>>>>> 4e3dcff59fdc16f2242fb8d33841e0e9ee1b2b6a
     // Load example JSON and set as default textarea content
     XHR.get('examples/example.json')
         .then(function (json) {
             jsonText.value = json;
         });
 
+    // Check for browser compat
     if (!isWebGLSupported) {
         info.hidden = true;
         unsupported.hidden = false;
     }
 
-    function setStatus(isValidJSON) {
+    resizeCanvas();
+
+    /*
+        Private utility functions
+    */
+    function setStatus(type) {
         info.hidden = true;
-        if (isValidJSON) {
-            invalid.hidden = true;
-            success.hidden = false;
-        } else {
-            invalid.hidden = false;
-            success.hidden = true;
+        rendered.hidden = true;
+        invalid.hidden = true;
+        progress.hidden = true;
+        success.hidden = true;
+        switch (type) {
+            case 'rendered':
+                rendered.hidden = false;
+                break;
+            case 'invalid':
+                invalid.hidden = false;
+                break;
+            case 'progress':
+                progress.hidden = false;
+                break;
+            case 'success':
+                success.hidden = false;
+                break;
         }
     }
+    function resizeCanvas() {
+        if (canvasHolder.offsetWidth !== canvas.width) {
+            canvas.width = canvasHolder.offsetWidth;
+        }
+        canvas.height = 600;
+    }
 
+    // Resize the canvas on window resize
+    window.addEventListener('resize', function () {
+        console.log('The canvas has been resized');
+        // resizeCanvas();
+    })
+
+    /*
+        Register control click events
+    */
     validate.addEventListener('click', function () {
-        setStatus(Helpers.isValidJSON(jsonText.value));
+        if (Helpers.isValidJSON(jsonText.value)) {
+            setStatus('success');
+        } else {
+            setStatus('invalid');
+        }
     });
-    render.addEventListener('click', function () {
-        if (isWebGLSupported) {
+    // Can't render if WebGL is not supported, don't register render click event
+    if (isWebGLSupported) {
+        render.addEventListener('click', function () {
             var isValid = Helpers.isValidJSON(jsonText.value);
             if (isValid) {
-                var dataToSend = {
+                socket.emit('worker-job', {
                     json: jsonText.value,
                     width: canvas.width,
                     height: canvas.height
-                };
-                socket.emit('render-world', dataToSend);
+                });
             }
-            setStatus(isValid);
-        }
-    });
-    
+            setStatus('progress');
+        });
+    }
     generate.addEventListener('click', function() {
-        var generatedScene = new THREE.Scene();
-        
-        for (var i = 0; i < 10; i++) {
-            var position = new THREE.Vector3(
-                (Math.random() * 400) - 200,
-                (Math.random() * 400) - 200,
-                (Math.random() * 400) - 200);
-            var scale = (Math.random() * 100) + 50;
-            var geo = new THREE.DodecahedronGeometry(scale, 0);
-            var material = new THREE.MeshBasicMaterial();
-            material.color = new THREE.Color(
-                Math.trunc(Math.random() * 255),
-                Math.trunc(Math.random() * 255),
-                Math.trunc(Math.random() * 255));
-            var mesh = new THREE.Mesh(geo, material);
-            mesh.translateX(position.x);
-            mesh.translateY(position.y);
-            mesh.translateZ(position.z);
-            mesh.updateMatrix();
-            generatedScene.add(mesh);
-        }
-
+        var generatedScene = ThreeJSRenderer.generateScene();
         jsonText.value = JSON.stringify(generatedScene.toJSON());
     });
 
+    /*
+        Register socket event listeners
+    */
     socket.on('num-connected', function (numConnected) {
         // hide until it is populated with content (numConnected)
         if (connectionTicker.hidden) {
@@ -113,13 +137,26 @@ document.addEventListener("DOMContentLoaded", function () {
             renderObj = ThreeJSRenderer.initialize(canvas);
         }
 
-        console.log(job);
-
         var worker = new Worker('scripts/rayTraceWorker.js');
+        
         worker.onmessage = function (result) {
-            socket.emit('worker-done', result.data);            
+            switch (result.data.type) {
+                case 'progress':
+                    socket.emit('worker-progress', result.data.percentage);
+                    progressStatus.style.width = result.data.percentage + '%';
+                    break;
+                case 'result':
+                    socket.emit('worker-done', result.data); 
+                    break;
+                default:
+                    console.error('invalid worker message type', result.data.type);
+            }          
+        };
+        worker.onerror = function (error) {
+            console.log('Worker Error:', error);
         };
 
+        // Start the worker
         worker.postMessage(job);
     });
     socket.on('render-complete', function (jobResult) {
@@ -136,5 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Display the rendered result to the user
         renderObj.setTextureFromArray(texture, jobResult.width, jobResult.height);
         renderObj.startRenderLoop();
+
+        setStatus('rendered');
     });
 });
