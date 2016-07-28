@@ -40,6 +40,9 @@ io.on('connection', function (socket) {
             socketId: socket.id
         }));
     });
+    socket.on('worker-progress', function (progress) {
+
+    });
     socket.on('worker-done', function (result) {
         console.log('A worker has completed its job');
         RenderWorkManager.emit('worker-done', result);

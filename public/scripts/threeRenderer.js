@@ -89,6 +89,30 @@ var ThreeJSRenderer = (function () {
         });
     }
 
+    function generateScene() {
+        var generatedScene = new THREE.Scene();
+        for (var i = 0; i < 3; i++) {
+            var position = new THREE.Vector3(
+                (Math.random() * 400) - 200,
+                (Math.random() * 400) - 200,
+                (Math.random() * 400) - 200);
+            var scale = (Math.random() * 60) + 10;
+            var geo = new THREE.DodecahedronGeometry(scale, 0);
+            var material = new THREE.MeshBasicMaterial();
+            material.color = new THREE.Color(
+                Math.trunc(Math.random() * 255),
+                Math.trunc(Math.random() * 255),
+                Math.trunc(Math.random() * 255));
+            var mesh = new THREE.Mesh(geo, material);
+            mesh.translateX(position.x);
+            mesh.translateY(position.y);
+            mesh.translateZ(position.z);
+            mesh.updateMatrix();
+            generatedScene.add(mesh);
+        }
+        return generatedScene;
+    }
+
     function setTextureFromWorld(mesh, world, width, height) {
         // After deserialization all objects need to update their world matrix
         for (var i = 0; i < world.children.length; i++) {
@@ -122,7 +146,8 @@ var ThreeJSRenderer = (function () {
     return {
         initialize: initialize,
         loadJSON: loadJSON,
-        parseJSON: parseJSON
+        parseJSON: parseJSON,
+        generateScene: generateScene
     };
 
 }());
