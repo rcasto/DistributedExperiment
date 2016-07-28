@@ -42,8 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Set canvas dimensions
-    canvas.width = 400;
-    canvas.height = 300;
+    canvas.width = 800;
+    canvas.height = 600;
 
     // Load example JSON and set as default textarea content
     XHR.get('examples/example.json')
