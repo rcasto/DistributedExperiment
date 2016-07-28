@@ -22,7 +22,13 @@ var RayTracer = (function () {
     }
 
     // Render a rectangle of the image.  NOTE: origin is in lower left of image
-    function render(bottom, left, top, right, fullWidth, fullHeight) {
+    function render(bottom, left, top, right, fullWidth, fullHeight, progress) {
+        var progressFunc = function(percentComplete) {};
+
+        if (progress !== undefined) {
+            progressFunc = progress;
+        }
+
         var width = right - left;
         var height = top - bottom;
         var size = width * height * 4;
@@ -71,6 +77,8 @@ var RayTracer = (function () {
             imageData[i + 1] = Math.trunc(green);
             imageData[i + 2] = Math.trunc(blue);
             imageData[i + 3] = 255;
+
+            progressFunc(Math.round((i / size) * 100));
         }
 
         // Return the rendered array
