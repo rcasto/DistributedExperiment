@@ -91,12 +91,12 @@ var ThreeJSRenderer = (function () {
 
     function generateScene() {
         var generatedScene = new THREE.Scene();
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 10; i++) {
             var position = new THREE.Vector3(
                 (Math.random() * 400) - 200,
                 (Math.random() * 400) - 200,
                 (Math.random() * 400) - 200);
-            var scale = (Math.random() * 60) + 10;
+            var scale = (Math.random() * 100) + 50;
             var geo = new THREE.DodecahedronGeometry(scale, 0);
             var material = new THREE.MeshBasicMaterial();
             material.color = new THREE.Color(
