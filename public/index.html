@@ -11,13 +11,17 @@
         <div class="json-world-container">
             <textarea class="json-world-text" spellcheck="false"></textarea>
             <div class="status-holder">
-                <div class="status info-status">
+                <div id="info" class="status info-status">
                     Copy/Paste a 
                     <a href="https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4">JSON World</a>
                     you want rendered. Click 'Render' to see an example
                 </div>
-                <div class="status error-status" hidden="true">Invalid JSON</div>
-                <div class="status success-status" hidden="true">Valid JSON</div>
+                <div id="invalid" class="status error-status" hidden="true">Invalid JSON</div>
+                <div id="success" class="status success-status" hidden="true">Valid JSON</div>
+                <div id="unsupported" class="status error-status" hidden="true">
+                    Unfortunately it looks like your browser does not support
+                    <a href="https://en.wikipedia.org/wiki/WebGL">WebGL</a>
+                </div>
             </div>
             <div class="json-world-controls">
                 <button class="validate">Validate</button>
@@ -38,7 +42,8 @@
 
         <script src="socket.io-client/socket.io.js"></script>
         <script src="three/build/three.min.js"></script>
-        
+
+        <script src="helpers.js"></script>        
         <script src="scripts/util/xhr.js"></script>
 
         <script src="scripts/raytracer.js"></script>
