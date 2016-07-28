@@ -50,24 +50,25 @@ document.addEventListener("DOMContentLoaded", function () {
     /*
         Private utility functions
     */
-    function setStatus(isValidJSON, isRendering) {
+    function setStatus(type) {
         info.hidden = true;
-        if (isValidJSON) {
-            invalid.hidden = true;
-            if (isRendering) {
-                if (progress.hidden) {
-                    rendered.hidden = true;
-                    progress.hidden = false;
-                } else {
-                    progress.hidden = true;
-                    rendered.hidden = false;
-                }
-            } else {
+        rendered.hidden = true;
+        invalid.hidden = true;
+        progress.hidden = true;
+        success.hidden = true;
+        switch (type) {
+            case 'rendered':
+                rendered.hidden = false;
+                break;
+            case 'invalid':
+                invalid.hidden = false;
+                break;
+            case 'progress':
+                progress.hidden = false;
+                break;
+            case 'success':
                 success.hidden = false;
-            }
-        } else {
-            invalid.hidden = false;
-            success.hidden = true;
+                break;
         }
     }
     function resizeCanvas() {
@@ -87,21 +88,24 @@ document.addEventListener("DOMContentLoaded", function () {
         Register control click events
     */
     validate.addEventListener('click', function () {
-        setStatus(Helpers.isValidJSON(jsonText.value), false);
+        if (Helpers.isValidJSON(jsonText.value)) {
+            setStatus('success');
+        } else {
+            setStatus('invalid');
+        }
     });
     // Can't render if WebGL is not supported, don't register render click event
     if (isWebGLSupported) {
         render.addEventListener('click', function () {
             var isValid = Helpers.isValidJSON(jsonText.value);
             if (isValid) {
-                var dataToSend = {
+                socket.emit('worker-job', {
                     json: jsonText.value,
                     width: canvas.width,
                     height: canvas.height
-                };
-                socket.emit('render-world', dataToSend);
+                });
             }
-            setStatus(isValid, true);
+            setStatus('progress');
         });
     }
     generate.addEventListener('click', function() {
@@ -132,11 +136,10 @@ document.addEventListener("DOMContentLoaded", function () {
         worker.onmessage = function (result) {
             switch (result.data.type) {
                 case 'progress':
-                    socket.emit('worker-progress', result.data);
+                    socket.emit('worker-progress', result.data.percentage);
                     progressStatus.style.width = result.data.percentage + '%';
                     break;
                 case 'result':
-                    setStatus(true, true);
                     socket.emit('worker-done', result.data); 
                     break;
                 default:
@@ -164,5 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Display the rendered result to the user
         renderObj.setTextureFromArray(texture, jobResult.width, jobResult.height);
         renderObj.startRenderLoop();
+
+        setStatus('rendered');
     });
 });
