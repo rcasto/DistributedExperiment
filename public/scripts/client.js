@@ -32,14 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Num connection components
     var connectionTicker = document.querySelector('.connection-ticker');
     var numConnections = document.querySelector('.num-connections');
-
-<<<<<<< HEAD
-    // Set canvas dimensions
-    canvas.width = 800;
-    canvas.height = 600;
-
-=======
->>>>>>> 4e3dcff59fdc16f2242fb8d33841e0e9ee1b2b6a
+    
     // Load example JSON and set as default textarea content
     XHR.get('examples/example.json')
         .then(function (json) {
