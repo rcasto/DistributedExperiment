@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Num connection components
     var connectionTicker = document.querySelector('.connection-ticker');
     var numConnections = document.querySelector('.num-connections');
-
+    
     // Load example JSON and set as default textarea content
     XHR.get('examples/example.json')
         .then(function (json) {
