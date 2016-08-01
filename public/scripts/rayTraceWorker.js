@@ -1,6 +1,6 @@
 importScripts('raytracer.js', 'threeRenderer.js', '../three/build/three.min.js');
 
-onmessage = function (job) {
+self.onmessage = function (job) {
     ThreeJSRenderer
         .parseJSON(job.data.json)
         .then(function (world) {
@@ -16,7 +16,7 @@ onmessage = function (job) {
             }
 
             // Initialize RayTracer
-            var rayTracerStaticCamera = new THREE.PerspectiveCamera(90, job.data.fullFrameWidth / job.data.fullFrameHeight, 1, 1500);
+            var rayTracerStaticCamera = new THREE.PerspectiveCamera(90, job.data.fullWidth / job.data.fullHeight, 1, 1500);
             // rayTracerStaticCamera.position.x = 400;
             // rayTracerStaticCamera.position.y = 400;
             rayTracerStaticCamera.position.z = 400;
@@ -53,9 +53,9 @@ onmessage = function (job) {
             };
 
             var texture = RayTracer.render(job.data.y, job.data.x, job.data.height, job.data.width, 
-                job.data.fullFrameWidth, job.data.fullFrameHeight, progress);
+                job.data.fullWidth, job.data.fullHeight, progress);
 
-            postMessage({
+            self.postMessage({
                 type: 'result',
                 x: job.data.x,
                 y: job.data.y,

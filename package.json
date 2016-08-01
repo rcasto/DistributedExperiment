@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "debug": "node-debug server.js"
   },
   "author": "Richie Casto",
   "license": "ISC",
@@ -17,5 +18,8 @@
     "normalize.css": "^4.2.0",
     "socket.io": "^1.4.8",
     "three": "^0.79.0"
+  },
+  "devDependencies": {
+    "node-inspector": "^0.12.8"
   }
 }

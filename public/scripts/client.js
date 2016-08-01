@@ -8,11 +8,10 @@ socket.on('error', function (error) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    var renderObj = null;
-    var isWebGLSupported = Helpers.isWebGLSupported();
-
     var canvasHolder = document.querySelector('.canvas-holder');
     var canvas = document.querySelector('.canvas');
+    var isWebGLSupported = Helpers.isWebGLSupported();
+    var renderObj = null;
 
     // Render control components
     var validate = document.querySelector('.validate');
@@ -76,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             canvas.width = canvasHolder.offsetWidth;
         }
         canvas.height = 600;
+        renderObj = ThreeJSRenderer.initialize(canvas);
     }
 
     // Resize the canvas on window resize
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
         render.addEventListener('click', function () {
             var isValid = Helpers.isValidJSON(jsonText.value);
             if (isValid) {
-                socket.emit('worker-job', {
+                socket.emit('render-request', {
                     json: jsonText.value,
                     width: canvas.width,
                     height: canvas.height
@@ -109,7 +109,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
     generate.addEventListener('click', function() {
-
         var generatedScene = ThreeJSRenderer.generateScene();
         jsonText.value = JSON.stringify(generatedScene.toJSON());
     });
@@ -124,13 +123,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         numConnections.innerHTML = numConnected;
     });
-    socket.on('worker-job', function (job) {
+    socket.on('render-job', function (job) {
         console.log('I got a job to do!');
-
-        if (!renderObj) {
-            renderObj = ThreeJSRenderer.initialize(canvas);
-        }
-
+        
         var worker = new Worker('scripts/rayTraceWorker.js');
         
         worker.onmessage = function (result) {
@@ -140,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     progressStatus.style.width = result.data.percentage + '%';
                     break;
                 case 'result':
+                    console.log('Worker is done!');
                     socket.emit('worker-done', result.data); 
                     break;
                 default:

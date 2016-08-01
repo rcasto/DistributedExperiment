@@ -85,7 +85,7 @@ var RayTracer = (function () {
             var collision = testCollision(ray);
 
             // if yes get color from that object
-            if (collision !== null) {
+            if (collision) {
                 // Compute reflection vector
                 var nDotD = ray.direction.dot(collision.normal);
                 var reflectionVector = ray.direction.clone().sub(collision.normal.clone().multiplyScalar(2.0 * nDotD)).normalize();

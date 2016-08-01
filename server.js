@@ -4,7 +4,8 @@ var http = require('http');
 var path = require('path');
 
 var ConnectionManager = require('./lib/connectionManager');
-var RenderWorkManager = require('./lib/renderWorkManager').initialize();
+var RenderWorkManager = require('./lib/renderWorkManager').create();
+// var RenderJobManager = require('./lib/renderJobManager').create();
 var Helpers = require('./shared/helpers');
 
 var port = process.env.PORT || 3000;
@@ -27,17 +28,20 @@ io.on('connection', function (socket) {
         console.log('A user connected to the network', ConnectionManager.getNumConnections());
         io.emit('num-connected', ConnectionManager.getNumConnections());
     }
+    
+    // RenderJobManager.addWorker(socket.id);
 
     socket.on('disconnect', function () {
         ConnectionManager.removeConnection(socket);
+        // RenderJobManager.removeWorker(socket.id);
         RenderWorkManager.removeWorker(socket.id);
         io.emit('num-connected', ConnectionManager.getNumConnections());
         console.log('A user disconnected', ConnectionManager.getNumConnections());
     });
 
-    socket.on('worker-job', function (job) {
+    socket.on('render-request', function (job) {
         console.log('Added render job');
-        RenderWorkManager.add(Helpers.extend(job, {
+        RenderWorkManager.addJob(Helpers.extend(job, {
             socketId: socket.id
         }));
     });
@@ -56,7 +60,6 @@ io.on('connection', function (socket) {
 });
 
 RenderWorkManager.on('render-progress', function (socketId, progress) {
-
 });
 RenderWorkManager.on('render-complete', function (socketId, jobResult) {
     io.to(socketId).emit('render-complete', jobResult);
